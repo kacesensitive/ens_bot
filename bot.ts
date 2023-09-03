@@ -87,8 +87,8 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can give us a one-sentence movie review, and we'll display it on stream! Just type your review in the chat, and make sure to tag @EverythingNowShow so we see it!",
     },
     JONKS: {
-        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type your message in the Chat, and make sure to tag @EverythingNowShow so we see it!",
-        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type your message in the Chat, and make sure to tag @EverythingNowShow so we see it!",
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type your message in the Chat, and make sure to tag @EverythingNowShow so we see it!!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type your message in the Chat, and make sure to tag @EverythingNowShow so we see it!!",
     },
     ENTV: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type your Fake Company Name in the chat, and make sure to tag @EverythingNowShow so we see it!",
