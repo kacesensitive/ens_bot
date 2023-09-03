@@ -1,0 +1,19 @@
+{
+  "name": "twitch-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node bot.ts"
+  },
+  "dependencies": {
+    "@types/tmi.js": "^1.8.3",
+    "dotenv": "^16.3.1",
+    "tmi.js": "^1.8.5",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "typescript": "^5.2.2"
+  }
+}
