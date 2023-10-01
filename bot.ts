@@ -75,8 +75,8 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
         SUBGIFT: "Thanks for the Gift Sub, {username}! You've helped us get one step closer to unlocking the Secret Level!",
     },
     SHARKSTANK: {
-        SUBSCRIPTION: "Thanks for the Sub, {username}!",
-        SUBGIFT: "Thanks for the Gift Sub, {username}!",
+        SUBSCRIPTION: `Thanks for the Sub, {username}! Every time you subscribe or gift a sub during tonight's show, you get to submit your own one-sentence pitch for the Sharks to react to and bid on! If we get enough subs, we will head over to a MASTER CLASS where you can get business advice from the Richest People In The World!`,
+        SUBGIFT: `Thanks for the Gift Sub, {username}! Every time you subscribe or gift a sub during tonight's show, you get to submit your own one-sentence pitch for the Sharks to react to and bid on! If we get enough subs, we will head over to a MASTER CLASS where you can get business advice from the Richest People In The World!`,
     },
     TOWNHALL: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Public Comment, and we'll display it on the projector screen for the whole town to read! Just type your message in the chat, and make sure to tag @EverythingNowShow so we see it!",
