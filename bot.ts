@@ -22,6 +22,7 @@ const MessageFormats = {
     JONKS: 'jonks',
     ENTV: 'entv',
     LIFTINGSPIRITS: 'lifting spirits',
+    FLIGHTRISK: 'flight risk',
 } as const;
 
 type MessageFormat = keyof typeof MessageFormats;
@@ -97,7 +98,11 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
     LIFTINGSPIRITS: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a message to be written on the Ghost's Tombstone, and we'll display it on stream! Just type your Tombstone Message in the chat, and make sure to tag @EverythingNowShow so we see it!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a message to be written on the Ghost's Tombstone, and we'll display it on stream! Just type your Tombstone Message in the chat, and make sure to tag @EverythingNowShow so we see it!",
-    }
+    },
+    FLIGHTRISK: {
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type the name you want to add in the Chat, and make sure to tag @EverythingNowShow so we see it!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type the name you want to add in the Chat, and make sure to tag @EverythingNowShow so we see it!",
+    },
 };
 
 let messageFormat: MessageFormat = 'JONKS';
