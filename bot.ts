@@ -23,6 +23,7 @@ const MessageFormats = {
     ENTV: 'entv',
     LIFTINGSPIRITS: 'lifting spirits',
     FLIGHTRISK: 'flight risk',
+    BIGEVENT: 'big event',
 } as const;
 
 type MessageFormat = keyof typeof MessageFormats;
@@ -38,6 +39,10 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
     RIDESHARE: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a review for the driver, and we'll display it on stream! Just type your review in the chat, and make sure to tag @EverythingNowShow so we see it!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a review for the driver, and we'll display it on stream! Just type your review in the chat, and make sure to tag @EverythingNowShow so we see it!",
+    },
+    BIGEVENT: {
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can give us a Breaking News Headline, and we'll display it on stream! Just type your headline in the chat, and make sure to tag @EverythingNowShow so we see it!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can give us a Breaking News Headline, and we'll display it on stream! Just type your headline in the chat, and make sure to tag @EverythingNowShow so we see it!",
     },
     ODDITIONS: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit the name of a Fake Production Company, and we'll display it on stream! Just type your Production Company name in the Chat, and make sure to tag @EverythingNowShow so we see it!",
