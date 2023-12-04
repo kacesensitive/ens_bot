@@ -124,6 +124,7 @@ const client = new tmi.Client(opts);
 
 client.connect().catch(console.error);
 
+
 // Random username generator
 function getRandomUsername() {
     const names = ['Chris', 'Jake', 'Rocky', 'Grant',];
@@ -140,30 +141,45 @@ const resetThankedSubgifters = () => {
     thankedSubgifters.clear();
 };
 
+let isActive = true;
+
 client.on('message', (channel, tags, message, self) => {
     if (self) return;
 
-    if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase().startsWith('!format ')) {
-        const newFormat = message.split(' ')[1].toUpperCase().replace(' ', '') as MessageFormat;
-        if (Object.keys(MessageFormats).includes(newFormat)) {
-            messageFormat = newFormat;
-            client.say(channel, `Message format changed to ${MessageFormats[messageFormat]}`);
+    if (isActive) {
+        if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase().startsWith('!format ')) {
+            const newFormat = message.split(' ')[1].toUpperCase().replace(' ', '') as MessageFormat;
+            if (Object.keys(MessageFormats).includes(newFormat)) {
+                messageFormat = newFormat;
+                client.say(channel, `Message format changed to ${MessageFormats[messageFormat]}`);
+            }
         }
-    }
 
-    // Simulate subscription
-    if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!subscription') {
-        sendMessage(channel, 'SUBSCRIPTION', { username: getRandomUsername() });
-    }
+        // Set isActive to false
+        if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!deactivate') {
+            isActive = false;
+            client.say(channel, 'Thank you for deactivating the bot!');
+        }
 
-    // Simulate subgift
-    if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!subgift') {
-        sendMessage(channel, 'SUBGIFT', { username: getRandomUsername(), recipient: getRandomUsername() });
-    }
+        // Simulate subscription
+        if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!subscription') {
+            sendMessage(channel, 'SUBSCRIPTION', { username: getRandomUsername() });
+        }
 
-    // Simulate submysterygift
-    if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!submysterygift') {
-        sendMessage(channel, 'SUBGIFT', { username: getRandomUsername(), recipient: `${getRandomGiftCount()} people` });
+        // Simulate subgift
+        if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!subgift') {
+            sendMessage(channel, 'SUBGIFT', { username: getRandomUsername(), recipient: getRandomUsername() });
+        }
+
+        // Simulate submysterygift
+        if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!submysterygift') {
+            sendMessage(channel, 'SUBGIFT', { username: getRandomUsername(), recipient: `${getRandomGiftCount()} people` });
+        }
+    } else if ((tags.mod || tags.username === 'tighwin' || tags.username === 'everythingnowshow') && message.toLowerCase() === '!activate') {
+        isActive = true;
+        client.say(channel, 'Thank you for activating the bot!');
+    } else {
+        console.log('Bot is deactivated');
     }
 });
 
