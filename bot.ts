@@ -184,26 +184,34 @@ client.on('message', (channel, tags, message, self) => {
 });
 
 client.on('subscription', (channel, username) => {
-    sendMessage(channel, 'SUBSCRIPTION', { username });
+    if (isActive) {
+        sendMessage(channel, 'SUBSCRIPTION', { username });
+    }
 });
 
 // Updated subgift event
 client.on('subgift', (channel, username, streakMonths, recipient) => {
-    if (!thankedSubgifters.has(username)) {
-        sendMessage(channel, 'SUBGIFT', { username, recipient });
-        thankedSubgifters.add(username);
-        setTimeout(resetThankedSubgifters, subgiftResetTime);
+    if (isActive) {
+        if (!thankedSubgifters.has(username)) {
+            sendMessage(channel, 'SUBGIFT', { username, recipient });
+            thankedSubgifters.add(username);
+            setTimeout(resetThankedSubgifters, subgiftResetTime);
+        }
     }
 });
 
 // Handle resub
 client.on('resub', (channel, username, streakMonths, msg, tags, methods) => {
-    sendMessage(channel, 'SUBSCRIPTION', { username });
+    if (isActive) {
+        sendMessage(channel, 'SUBSCRIPTION', { username });
+    }
 });
 
 // Handle primepaidupgrade
 client.on('primepaidupgrade', (channel, username, methods, tags) => {
-    sendMessage(channel, 'SUBSCRIPTION', { username });
+    if (isActive) {
+        sendMessage(channel, 'SUBSCRIPTION', { username });
+    }
 });
 
 function sendMessage(channel: string, category: Category, variables: { [key: string]: string }) {
