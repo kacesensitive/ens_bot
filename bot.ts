@@ -24,6 +24,7 @@ const MessageFormats = {
     LIFTINGSPIRITS: 'lifting spirits',
     FLIGHTRISK: 'flight risk',
     BIGEVENT: 'big event',
+    SUBJECTIVEJEOPARDY: 'subjective jeopardy',
 } as const;
 
 type MessageFormat = keyof typeof MessageFormats;
@@ -107,6 +108,10 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
     FLIGHTRISK: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type the name you want to add in the Chat, and make sure to tag @EverythingNowShow so we see it!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type the name you want to add in the Chat, and make sure to tag @EverythingNowShow so we see it!",
+    },
+    SUBJECTIVEJEOPARDY: {
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit your own question (e.g. 'This is the best dance move'), and we'll use it on the show! Just type your question in the chat, and make sure to tag @EverythingNowShow so we see it!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit your own question (e.g. 'This is the best dance move'), and we'll use it on the show! Just type your question in the chat, and make sure to tag @EverythingNowShow so we see it!",
     },
 };
 
