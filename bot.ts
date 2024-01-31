@@ -313,7 +313,7 @@ client.on('message', async (channel, tags, message, self) => {
         }
 
         if (message.toLowerCase() === '!clearall') {
-            if (tags.username === 'tighwin' || tags.username === 'everythingnowshow') {
+            if (tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') {
                 const success = await clearAllMessages();
                 const success2 = await clearAllSubscribers();
                 if (success && success2) {
