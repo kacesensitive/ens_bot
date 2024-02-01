@@ -326,6 +326,11 @@ client.on('message', async (channel, tags, message, self) => {
             }
         }
 
+        if (message.toLowerCase() === '!simulate') {
+            sendMessage(channel, 'SUBSCRIPTION', { username: tags.username || '-'});
+            await addSubscriber(tags.username || '-');
+        }
+
     } else if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase() === '!activate') {
         isActive = true;
         client.say(channel, 'Thank you for activating the bot!');
@@ -362,9 +367,10 @@ client.on('resub', async (channel, username, streakMonths, msg, tags, methods) =
 });
 
 // Handle primepaidupgrade
-client.on('primepaidupgrade', (channel, username, methods, tags) => {
+client.on('primepaidupgrade', async (channel, username, methods, tags) => {
     if (isActive) {
         sendMessage(channel, 'SUBSCRIPTION', { username });
+        await addSubscriber(username);
     }
 });
 
