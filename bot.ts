@@ -229,7 +229,6 @@ async function removeOldestSubscriber(username: string): Promise<boolean> {
         .from('subscribers')
         .select('*')
         .eq('username', username)
-        .order('created_at', { ascending: true })
         .limit(1);
 
     if (fetchError) {
