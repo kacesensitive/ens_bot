@@ -320,11 +320,6 @@ client.on('message', async (channel, tags, message, self) => {
             }
         }
 
-        if (message.toLowerCase() === '!simulate') {
-            sendMessage(channel, 'SUBSCRIPTION', { username: tags.username || '-'});
-            await addSubscriber(tags.username || '-');
-        }
-
     } else if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase() === '!activate') {
         isActive = true;
         client.say(channel, 'Thank you for activating the bot!');
