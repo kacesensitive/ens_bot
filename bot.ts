@@ -154,16 +154,11 @@ const resetThankedSubgifters = () => {
 async function canSubmit(username: string, isExceptionUser: boolean): Promise<boolean> {
     if (isExceptionUser) return true;
 
-    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     // Check if the user is a recent subscriber
     const { data: subscriberData, error: subscriberError } = await supabase
         .from('subscribers')
         .select('*')
-        .eq('username', username)
-        .gt('created_at', twelveHoursAgo);
+        .eq('username', username);
 
     if (subscriberError) {
         console.error('Error checking subscriber status:', subscriberError);
