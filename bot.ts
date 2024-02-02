@@ -158,7 +158,7 @@ async function canSubmit(username: string, isExceptionUser: boolean): Promise<bo
     const { data: subscriberData, error: subscriberError } = await supabase
         .from('subscribers')
         .select('*')
-        .eq('username', username);
+        .eq('username', username.toLowerCase());
 
     if (subscriberError) {
         console.error('Error checking subscriber status:', subscriberError);
@@ -217,7 +217,7 @@ async function clearAllSubscribers() {
 async function addSubscriber(username: string) {
     const { error } = await supabase
         .from('subscribers')
-        .insert([{ username }]);
+        .insert([{ username: username.toLowerCase() }]);
 
     if (error) {
         console.error('Error adding subscriber:', error);
@@ -228,7 +228,7 @@ async function removeOldestSubscriber(username: string): Promise<boolean> {
     const { data, error: fetchError } = await supabase
         .from('subscribers')
         .select('*')
-        .eq('username', username)
+        .eq('username', username.toLowerCase())
         .limit(1);
 
     if (fetchError) {
