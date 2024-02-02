@@ -329,7 +329,7 @@ client.on('message', async (channel, tags, message, self) => {
 });
 
 client.on('subscription', async (channel, username) => {
-    if (isActive) {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
         sendMessage(channel, 'SUBSCRIPTION', { username });
         await addSubscriber(username);
     }
@@ -337,7 +337,7 @@ client.on('subscription', async (channel, username) => {
 
 // Updated subgift event
 client.on('subgift', async (channel, username, streakMonths, recipient) => {
-    if (isActive) {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
         if (!thankedSubgifters.has(username)) {
             sendMessage(channel, 'SUBGIFT', { username, recipient });
             thankedSubgifters.add(username);
@@ -349,7 +349,7 @@ client.on('subgift', async (channel, username, streakMonths, recipient) => {
 
 // Handle resub
 client.on('resub', async (channel, username, streakMonths, msg, tags, methods) => {
-    if (isActive) {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
         sendMessage(channel, 'SUBSCRIPTION', { username });
         await addSubscriber(username);
     }
@@ -357,7 +357,23 @@ client.on('resub', async (channel, username, streakMonths, msg, tags, methods) =
 
 // Handle primepaidupgrade
 client.on('primepaidupgrade', async (channel, username, methods, tags) => {
-    if (isActive) {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
+        sendMessage(channel, 'SUBSCRIPTION', { username });
+        await addSubscriber(username);
+    }
+});
+
+// Handle giftpaidupgrade
+client.on('giftpaidupgrade', async (channel, username, methods, tags) => {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
+        sendMessage(channel, 'SUBSCRIPTION', { username });
+        await addSubscriber(username);
+    }
+});
+
+// Handle anongiftpaidupgrade
+client.on('anongiftpaidupgrade', async (channel, username) => {
+    if (isActive && username.toLowerCase() !== 'ananonymousgifter') {
         sendMessage(channel, 'SUBSCRIPTION', { username });
         await addSubscriber(username);
     }
