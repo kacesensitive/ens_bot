@@ -302,7 +302,7 @@ client.on('message', async (channel, tags, message, self) => {
                 await saveSubmission(tags.username || '-', submission);
                 client.say(channel, `Thanks for your submission, ${tags.username}!`);
             } else {
-                client.say(channel, `Sorry, ${tags.username}, you can't submit right now :<`);
+                client.say(channel, `Sorry, ${tags.username}, it looks like you haven't earned a submission yet! If you want to submit, subscribe or gift a sub - then try again!`);
             }
         }
 
