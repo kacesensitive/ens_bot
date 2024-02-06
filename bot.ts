@@ -70,8 +70,8 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
     },
     HELPWANTED: {
-        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can choose somebody to fire! It can be anybody- a celebrity, a fictional character, a real person... Just type !submit followed by the person you want to fire!",
-        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can choose somebody to fire! It can be anybody- a celebrity, a fictional character, a real person... Just type !submit followed by the person you want to fire!",
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can choose something to add to the job applicant's resume! It can be prior experience, education, or a skill! Just type !submit followed by the person you want to fire!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can choose something to add to the job applicant's resume! It can be prior experience, education, or a skill! Just type !submit followed by the person you want to fire!",
     },
     BARLEYSBAR: {
         SUBSCRIPTION: "Thanks for the Sub, {username}!",
