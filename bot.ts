@@ -292,6 +292,15 @@ client.on('message', async (channel, tags, message, self) => {
             sendMessage(channel, 'SUBGIFT', { username: getRandomUsername(), recipient: `${getRandomGiftCount()} people` });
         }
 
+        // Give a user the ability to submit
+        if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase() === '!give') {
+            const username = message.split(' ')[1];
+            if (username) {
+                await addSubscriber(username);
+                client.say(channel, `${username} can now submit!`);
+            }
+        }
+
         if (message.toLowerCase().startsWith('!submit')) {
             const isExceptionUser = tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow';
             if (await canSubmit(tags.username || '-', isExceptionUser)) {
