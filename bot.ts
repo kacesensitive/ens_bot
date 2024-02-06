@@ -293,7 +293,7 @@ client.on('message', async (channel, tags, message, self) => {
         }
 
         // Give a user the ability to submit
-        if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase() === '!give') {
+        if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase().startsWith('!give')) {
             const username = message.split(' ')[1];
             if (username) {
                 await addSubscriber(username);
