@@ -451,7 +451,7 @@ setInterval(async () => {
         if (subscriberData.length === 0) {
             return;
         }
-        const subscriberList = subscriberData.map((subscriber: any) => `@${subscriber.username}`).join(' ');
+        const subscriberList = Array.from(new Set(subscriberData.map((subscriber: any) => `@${subscriber.username}`))).join(' ');
         client.say(opts.channels[0], `Hey ${subscriberList}, just a reminder that you've earned an ${Messages[messageFormat].REMINDSUBMISSION}`);
     }
 }, 1500000);
