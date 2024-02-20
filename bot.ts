@@ -347,14 +347,19 @@ client.on('message', async (channel, tags, message, self) => {
         if (message.toLowerCase().startsWith('!submit')) {
             const isExceptionUser = tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow';
             if (await canSubmit(tags.username || '-', isExceptionUser)) {
+                // if the message is longer than 250 characters, don't save it and send a message to the user
+                if (message.slice('!submit'.length).trim().length > 200) {
+                    client.say(channel, `Sorry, @${tags.username}, your submission is too long! Please keep it under 200 characters.`);
+                    return;
+                }
                 if (!isExceptionUser) {
                     await removeOldestSubscriber(tags.username || '-');
                 }
                 const submission = message.slice('!submit'.length).trim();
                 await saveSubmission(tags.username || '-', submission);
-                client.say(channel, `Thanks for your submission, ${tags.username}!`);
+                client.say(channel, `Thanks for your submission, @${tags.username}!`);
             } else {
-                client.say(channel, `Sorry, ${tags.username}, it looks like you haven't earned a submission yet! If you want to submit, subscribe or gift a sub - then try again!`);
+                client.say(channel, `Sorry, @${tags.username}, it looks like you haven't earned a submission yet! If you want to submit, subscribe or gift a sub - then try again!`);
             }
         }
 
@@ -368,7 +373,7 @@ client.on('message', async (channel, tags, message, self) => {
                     client.say(channel, 'Failed to clear messages.');
                 }
             } else {
-                client.say(channel, `Sorry, ${tags.username}, you are not authorized to perform this action.`);
+                client.say(channel, `Sorry, @${tags.username}, you are not authorized to perform this action.`);
             }
         }
 
