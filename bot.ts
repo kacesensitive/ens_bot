@@ -36,106 +36,126 @@ type MessageFormat = keyof typeof MessageFormats;
 const Categories = {
     SUBSCRIPTION: 'subscription',
     SUBGIFT: 'subgift',
-    REMINDSUBMISSION: 'remind'
+    REMINDSUBMISSION: 'remind',
+    CHARACTERLIMIT: 200
 } as const;
 
 type Category = keyof typeof Categories;
 
-const Messages: { [key in MessageFormat]: { [key in Category]: string } } = {
+const Messages: { [key in MessageFormat]: { [key in Category]: string | number }; } = {
     RIDESHARE: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a review for the driver, and we'll display it on stream! Just type !submit followed by your review!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a review for the driver, and we'll display it on stream! Just type !submit followed by your review!",
-        REMINDSUBMISSION: "oppurtunity to leave a review for the driver! Just type !submit followed by your review!"
+        REMINDSUBMISSION: "oppurtunity to leave a review for the driver! Just type !submit followed by your review!",
+        CHARACTERLIMIT: 200
     },
     BIGEVENT: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can give us a Breaking News Headline, and we'll display it on stream! Just type !submit followed by your headline!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can give us a Breaking News Headline, and we'll display it on stream! Just type !submit followed by your headline!",
-        REMINDSUBMISSION: "oppurtunity to give us a Breaking News Headline! Just type !submit followed by your headline!"
+        REMINDSUBMISSION: "oppurtunity to give us a Breaking News Headline! Just type !submit followed by your headline!",
+        CHARACTERLIMIT: 200
     },
     ODDITIONS: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit the name of a Fake Production Company, and we'll display it on stream! Just type !submit followed by your company!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit the name of a Fake Production Company, and we'll display it on stream! Just type !submit followed by your company!",
-        REMINDSUBMISSION: "oppurtunity to submit the name of a Fake Production Company! Just type !submit followed by your company!"
+        REMINDSUBMISSION: "oppurtunity to submit the name of a Fake Production Company! Just type !submit followed by your company!",
+        CHARACTERLIMIT: 80
     },
     FIGUREDRAWING: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a review for Professor Sideways and we'll display it on stream! Just type !submit followed by your review!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a review for Professor Sideways and we'll display it on stream! Just type !submit followed by your review!",
-        REMINDSUBMISSION: "oppurtunity to leave a review for Professor Sideways! Just type !submit followed by your review!"
+        REMINDSUBMISSION: "oppurtunity to leave a review for Professor Sideways! Just type !submit followed by your review!",
+        CHARACTERLIMIT: 200
     },
     OOPSALLRISE: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a piece of written testimony to entered into the record, and we'll display it on stream! Just type !submit followed by your testimony!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a piece of written testimony to entered into the record, and we'll display it on stream! Just type !submit followed by your testimony!",
-        REMINDSUBMISSION: "oppurtunity to submit a piece of written testimony to entered into the record! Just type !submit followed by your testimony!"
+        REMINDSUBMISSION: "oppurtunity to submit a piece of written testimony to entered into the record! Just type !submit followed by your testimony!",
+        CHARACTERLIMIT: 200
     },
     CALLCENTER: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can write a message in our co-workers Greeting Card, and we'll display it on stream! Just type !submit followed by your message!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can write a message in our co-workers Greeting Card, and we'll display it on stream! Just type !submit followed by your message!",
-        REMINDSUBMISSION: "oppurtunity to write a message in our co-workers Greeting Card! Just type !submit followed by your message!"
+        REMINDSUBMISSION: "oppurtunity to write a message in our co-workers Greeting Card! Just type !submit followed by your message!",
+        CHARACTERLIMIT: 200
     },
     TALKFIGHT: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
-        REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!"
+        REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!",
+        CHARACTERLIMIT: 80
     },
     HELPWANTED: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can to add some experience to the job applicant's resume! Just type !submit followed by the text you want to add to the resume!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can add some experience to the job applicant's resume! Just type !submit followed by the text you want to add to the resume!",
-        REMINDSUBMISSION: "oppurtunity to add some experience to the job applicant's resume! Just type !submit followed by the text you want to add to the resume!"
+        REMINDSUBMISSION: "oppurtunity to add some experience to the job applicant's resume! Just type !submit followed by the text you want to add to the resume!",
+        CHARACTERLIMIT: 200
     },
     BARLEYSBAR: {
         SUBSCRIPTION: "Thanks for the Sub, {username}!",
         SUBGIFT: "Thanks for the Gift Sub, {username}!",
-        REMINDSUBMISSION: "oppurtunity to submit a Fake Drink Name! Just type !submit followed by your drink name!"
+        REMINDSUBMISSION: "oppurtunity to submit a Fake Drink Name! Just type !submit followed by your drink name!",
+        CHARACTERLIMIT: 80
     },
     ANALYZEDEEZ: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can choose a treatment to prescribe the patient! It can be a medication, a lifestyle change... anything you want! We'll display it on stream! Just type !submit followed by your prescription!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can choose a treatment to prescribe the patient! It can be a medication, a lifestyle change... anything you want! We'll display it on stream! Just type !submit followed by your prescription!",
-        REMINDSUBMISSION: "oppurtunity to choose a treatment to prescribe the patient! Just type !submit followed by your prescription!"
+        REMINDSUBMISSION: "oppurtunity to choose a treatment to prescribe the patient! Just type !submit followed by your prescription!",
+        CHARACTERLIMIT: 200
     },
     PARTYQUEST: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! You've helped us get one step closer to unlocking the Secret Level!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! You've helped us get one step closer to unlocking the Secret Level!",
-        REMINDSUBMISSION: "N/A"
+        REMINDSUBMISSION: "N/A",
+        CHARACTERLIMIT: 200
     },
     SHARKSTANK: {
         SUBSCRIPTION: `Thanks for the Sub, {username}! As a reward, you get to submit your own one-sentence pitch for the Sharks to react to and bid on! If we get enough subs, we will head over to a MASTER CLASS where you can get business advice from the Richest People In The World!`,
         SUBGIFT: `Thanks for the Gift Sub, {username}! As a reward, you get to submit your own one-sentence pitch for the Sharks to react to and bid on! If we get enough subs, we will head over to a MASTER CLASS where you can get business advice from the Richest People In The World!`,
-        REMINDSUBMISSION: "oppurtunity to submit your own one-sentence pitch for the Sharks to react to and bid on! Just type !submit followed by your pitch!"
+        REMINDSUBMISSION: "oppurtunity to submit your own one-sentence pitch for the Sharks to react to and bid on! Just type !submit followed by your pitch!",
+        CHARACTERLIMIT: 200
     },
     TOWNHALL: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Public Comment, and we'll display it on the projector screen for the whole town to read! Just type !submit followed by your comment!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Public Comment, and we'll display it on the projector screen for the whole town to read! Just type !submit followed by your comment!",
-        REMINDSUBMISSION: "oppurtunity to submit a Public Comment! Just type !submit followed by your comment!"
+        REMINDSUBMISSION: "oppurtunity to submit a Public Comment! Just type !submit followed by your comment!",
+        CHARACTERLIMIT: 200
     },
     VIDEOSTORE: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can give us a one-sentence movie review, and we'll display it on stream! Just type !submit followed by your review!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can give us a one-sentence movie review, and we'll display it on stream! Just type !submit followed by your review!",
-        REMINDSUBMISSION: "oppurtunity to give us a one-sentence movie review! Just type !submit followed by your review!"
+        REMINDSUBMISSION: "oppurtunity to give us a one-sentence movie review! Just type !submit followed by your review!",
+        CHARACTERLIMIT: 200
     },
     JONKS: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type !submit followed by your message!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can leave a message in Jonk's Guest Book, and we'll display it on stream! Just type !submit followed by your message!",
-        REMINDSUBMISSION: "oppurtunity to leave a message in Jonk's Guest Book! Just type !submit followed by your message!"
+        REMINDSUBMISSION: "oppurtunity to leave a message in Jonk's Guest Book! Just type !submit followed by your message!",
+        CHARACTERLIMIT: 200
     },
     ENTV: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
-        REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!"
+        REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!",
+        CHARACTERLIMIT: 80
     },
     LIFTINGSPIRITS: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a message to be written on the Ghost's Tombstone, and we'll display it on stream! Just type !submit followed by your tombstone message!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a message to be written on the Ghost's Tombstone, and we'll display it on stream! Just type !submit followed by your tombstone message!",
-        REMINDSUBMISSION: "oppurtunity to submit a message to be written on the Ghost's Tombstone! Just type !submit followed by your tombstone message!"
+        REMINDSUBMISSION: "oppurtunity to submit a message to be written on the Ghost's Tombstone! Just type !submit followed by your tombstone message!",
+        CHARACTERLIMIT: 200
     },
     FLIGHTRISK: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type !submit followed by the name you want added to the list!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can add a name to our 'FBI Most Wanted List', and we'll display it on stream! Just type !submit followed by the name you want added to the list!",
-        REMINDSUBMISSION: "oppurtunity to add a name to our 'FBI Most Wanted List'! Just type !submit followed by the name you want added to the list!"
+        REMINDSUBMISSION: "oppurtunity to add a name to our 'FBI Most Wanted List'! Just type !submit followed by the name you want added to the list!",
+        CHARACTERLIMIT: 80
     },
     SUBJECTIVEJEOPARDY: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit your own question (e.g. 'This is the best dance move'), and we'll use it on the show! Just type !submit followed by your question!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit your own question (e.g. 'This is the best dance move'), and we'll use it on the show! Just type !submit followed by your question!",
-        REMINDSUBMISSION: "oppurtunity to submit your own question! Just type !submit followed by your question!"
+        REMINDSUBMISSION: "oppurtunity to submit your own question! Just type !submit followed by your question!",
+        CHARACTERLIMIT: 200
     },
 };
 
@@ -156,7 +176,7 @@ client.connect().catch(console.error);
 
 // Random username generator
 function getRandomUsername() {
-    const names = ['Chris', 'Jake', 'Rocky', 'Grant',];
+    const names = ['Chris', 'Jake', 'Rocky', 'Grant', 'Alex'];
     return `ENS_${names[Math.floor(Math.random() * names.length)]}`;
 }
 
@@ -347,9 +367,9 @@ client.on('message', async (channel, tags, message, self) => {
         if (message.toLowerCase().startsWith('!submit')) {
             const isExceptionUser = tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow';
             if (await canSubmit(tags.username || '-', isExceptionUser)) {
-                // if the message is longer than 250 characters, don't save it and send a message to the user
-                if (message.slice('!submit'.length).trim().length > 200) {
-                    client.say(channel, `Sorry, @${tags.username}, your submission is too long! Please keep it under 200 characters.`);
+                // if the message is longer than the character limit, don't save it and send a message to the user
+                if (typeof Messages[messageFormat].REMINDSUBMISSION === 'number' && message.slice('!submit'.length).trim().length > Number(Messages[messageFormat].CHARACTERLIMIT)) {
+                    client.say(channel, `Sorry, @${tags.username}, your submission is too long! Please keep it under ${Messages[messageFormat].CHARACTERLIMIT} characters.`);
                     return;
                 }
                 if (!isExceptionUser) {
@@ -464,7 +484,7 @@ setInterval(async () => {
 function sendMessage(channel: string, category: Category, variables: { [key: string]: string }) {
     let messageTemplate = Messages[messageFormat][category];
     for (const [key, value] of Object.entries(variables)) {
-        messageTemplate = messageTemplate.replace(`{${key}}`, value);
+        messageTemplate = messageTemplate.toString().replace(`{${key}}`, value);
     }
-    client.say(channel, messageTemplate);
+    client.say(channel, messageTemplate.toString());
 }
