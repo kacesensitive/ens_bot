@@ -171,7 +171,9 @@ const opts = {
 
 const client = new tmi.Client(opts);
 
-client.connect().catch(console.error);
+client.connect().then(() => {
+    console.log('Connected to Twitch chat');
+});
 
 
 // Random username generator
@@ -365,21 +367,25 @@ client.on('message', async (channel, tags, message, self) => {
         }
 
         if (message.toLowerCase().startsWith('!submit')) {
-            const isExceptionUser = tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow';
-            if (await canSubmit(tags.username || '-', isExceptionUser)) {
-                // if the message is longer than the character limit, don't save it and send a message to the user
-                if (typeof Messages[messageFormat].REMINDSUBMISSION === 'number' && message.slice('!submit'.length).trim().length > Number(Messages[messageFormat].CHARACTERLIMIT)) {
-                    client.say(channel, `Sorry, @${tags.username}, your submission is too long! Please keep it under ${Messages[messageFormat].CHARACTERLIMIT} characters.`);
-                    return;
+            if (message.toLowerCase().startsWith('!submit')) {
+                const isExceptionUser = tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow';
+                if (await canSubmit(tags.username || '-', isExceptionUser)) {
+                    const submissionLength = message.slice('!submit'.length).trim().length;
+                    const characterLimit = Number(Messages[messageFormat].CHARACTERLIMIT);
+
+                    if (submissionLength > characterLimit) {
+                        client.say(channel, `Sorry, @${tags.username}, your submission is too long! Please keep it under ${characterLimit} characters.`);
+                    } else {
+                        if (!isExceptionUser) {
+                            await removeOldestSubscriber(tags.username || '-');
+                        }
+                        const submission = message.slice('!submit'.length).trim();
+                        await saveSubmission(tags.username || '-', submission);
+                        client.say(channel, `Thanks for your submission, @${tags.username}!`);
+                    }
+                } else {
+                    client.say(channel, `Sorry, @${tags.username}, it looks like you haven't earned a submission yet! If you want to submit, subscribe or gift a sub - then try again!`);
                 }
-                if (!isExceptionUser) {
-                    await removeOldestSubscriber(tags.username || '-');
-                }
-                const submission = message.slice('!submit'.length).trim();
-                await saveSubmission(tags.username || '-', submission);
-                client.say(channel, `Thanks for your submission, @${tags.username}!`);
-            } else {
-                client.say(channel, `Sorry, @${tags.username}, it looks like you haven't earned a submission yet! If you want to submit, subscribe or gift a sub - then try again!`);
             }
         }
 
@@ -463,7 +469,7 @@ setInterval(async () => {
         if (messageFormat === 'PARTYQUEST') {
             return;
         }
-        
+
         const { data: subscriberData, error: subscriberError } = await supabase
             .from('subscribers')
             .select('username');
