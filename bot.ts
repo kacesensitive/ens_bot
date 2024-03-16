@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const thankedSubgifters = new Set();
 const subgiftResetTime = 10000;
+console.log('Starting bot...');
+console.log('Connecting to Twitch chat...');
+
 
 config();
 
@@ -171,6 +174,11 @@ const opts = {
 
 const client = new tmi.Client(opts);
 
+client.connect().then(() => {
+    console.log('Connected to Twitch chat');
+}
+);
+
 
 
 // Random username generator
@@ -302,6 +310,7 @@ let isActive = true;
 
 client.on('message', async (channel, tags, message, self) => {
     if (self) return;
+
 
     // if 5 "1" are sent in a row send a "2" in chat and vice versa
     if (message === '1') {
