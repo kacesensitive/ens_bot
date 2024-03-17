@@ -157,7 +157,7 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string | number }
     SUBJECTIVEJEOPARDY: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can change the score of a contestant! Just type !submit followed by the contestant name and new score! (e.g. 'Bob 420' or 'Sarah -1000')",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can change the score of a contestant! Just type !submit followed by the contestant name and new score! (e.g. 'Bob 420' or 'Sarah -1000')",
-        REMINDSUBMISSION: "opportunity to submit your own question! Just type !submit followed by your question!",
+        REMINDSUBMISSION: "opportunity to change the score of a contestant! Just type !submit followed by the contestant name and new score! (e.g. 'Bob 420' or 'Sarah -1000')",
         CHARACTERLIMIT: 25
     },
 };
