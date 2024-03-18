@@ -10,7 +10,7 @@ load_dotenv()
 # Your bot token (securely loaded from .env file)
 BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 # The ID of the channel where you want to create the thread
-CHANNEL_ID = 1140774753112703086
+CHANNEL_ID = 565093774125039634
 
 intents = discord.Intents.default()
 intents.messages = True
