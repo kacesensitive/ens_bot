@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 
@@ -22,7 +22,9 @@ async def on_ready():
     print(f'Logged in as {bot.user}!')
 
     # Get the current date in a specific format (e.g., YYYY-MM-DD)
-    date_today = datetime.now().strftime('%Y-%m-%d')
+    date = datetime.now()
+    date_today_raw = date - timedelta(days=1)
+    date_today = date_today_raw.strftime('%Y-%m-%d')
     thread_name = f"Stream Thread {date_today}"
 
     # Fetch the channel
@@ -35,5 +37,6 @@ async def on_ready():
         await bot.close()
     else:
         print("Channel not found.")
+        await bot.close()
 
 bot.run(BOT_TOKEN)
