@@ -32,6 +32,7 @@ const MessageFormats = {
     FLIGHTRISK: 'flight risk',
     BIGEVENT: 'big event',
     SUBJECTIVEJEOPARDY: 'subjective jeopardy',
+    BUDDYBATTLE: 'buddy battle'
 } as const;
 
 type MessageFormat = keyof typeof MessageFormats;
@@ -159,6 +160,12 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string | number }
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can change the score of a contestant! Just type !submit followed by the contestant name and new score! (e.g. 'Bob 420' or 'Sarah -1000')",
         REMINDSUBMISSION: "opportunity to change the score of a contestant! Just type !submit followed by the contestant name and new score! (e.g. 'Bob 420' or 'Sarah -1000')",
         CHARACTERLIMIT: 25
+    },
+    BUDDYBATTLE: {
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can add a prize to tonight's GRAND PRIZE and we'll display it on stream! Just type !submit followed your prize!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can add a prize to tonight's GRAND PRIZE and we'll display it on stream! Just type !submit followed your prize!",
+        REMINDSUBMISSION: "opportunity to add a prize to tonight's GRAND PRIZE! Just type !submit followed your prize!",
+        CHARACTERLIMIT: 60
     },
 };
 
