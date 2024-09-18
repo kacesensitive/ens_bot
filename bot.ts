@@ -19,6 +19,7 @@ const MessageFormats = {
     OOPSALLRISE: 'oops all rise',
     CALLCENTER: 'call center',
     TALKFIGHT: 'talk fight',
+    TAKEOFF: 'take off',
     HELPWANTED: 'help wanted',
     BARLEYSBAR: "barley's bar",
     ANALYZEDEEZ: 'analyze deez',
@@ -84,6 +85,12 @@ const Messages: { [key in MessageFormat]: { [key in Category]: string | number }
         CHARACTERLIMIT: 200
     },
     TALKFIGHT: {
+        SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
+        SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
+        REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!",
+        CHARACTERLIMIT: 80
+    },
+    TAKEOFF: {
         SUBSCRIPTION: "Thanks for the Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
         SUBGIFT: "Thanks for the Gift Sub, {username}! As a reward, you can submit a Fake Company Name as a sponsor of tonight's show, and we'll display it on stream! Just type !submit followed by your company name!",
         REMINDSUBMISSION: "oppurtunity to submit a Fake Company Name as a sponsor of tonight's show! Just type !submit followed by your company name!",
