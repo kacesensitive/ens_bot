@@ -489,6 +489,8 @@ client.on('anongiftpaidupgrade', async (channel, username) => {
     }
 });
 
+const lastReminderTimes: { [username: string]: number } = {};
+
 // Every 25 minutes, remind the users with subscriptions to submit, query the list of subscribers and send a message mentioning all of them
 setInterval(async () => {
     if (isActive) {
@@ -509,8 +511,24 @@ setInterval(async () => {
         if (subscriberData.length === 0) {
             return;
         }
-        const subscriberList = Array.from(new Set(subscriberData.map((subscriber: any) => `@${subscriber.username}`))).join(' ');
-        client.say(opts.channels[0], `Hey ${subscriberList}, just a reminder that you've earned an ${Messages[messageFormat].REMINDSUBMISSION}`);
+
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const subscriberList = Array.from(new Set(subscriberData
+            .map((subscriber: any) => subscriber.username)
+            .filter((username: string) => {
+                if (!lastReminderTimes[username] || (now - lastReminderTimes[username]) > oneDay) {
+                    lastReminderTimes[username] = now;
+                    return true;
+                }
+                return false;
+            })
+            .map((username: string) => `@${username}`)))
+            .join(' ');
+
+        if (subscriberList.length > 0) {
+            client.say(opts.channels[0], `Hey ${subscriberList}, just a reminder that you've earned an ${Messages[messageFormat].REMINDSUBMISSION}`);
+        }
     }
 }, 1500000);
 
