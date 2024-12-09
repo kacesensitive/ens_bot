@@ -207,7 +207,43 @@ client.connect().then(() => {
 }
 );
 
+function hashUsername(username: string): number {
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        const char = username.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
 
+function getSantaMessage(username: string): string {
+    // if the username contains "scottwith" then the message is "Scott, we've seen your search history. You're on the naughty list."
+    if (username.toLowerCase().includes('scottwith')) {
+        return 'Scott, we\'ve seen your search history. You\'re on the naughty list.';
+    }
+
+    // if the username contains "creativesteve" then the message is "Steve, you're obviously on the nice list."
+    if (username.toLowerCase().includes('creativesteve')) {
+        return 'Steve, you\'re obviously on the nice list.';
+    }
+
+    const naughtyMessages = [
+        `${username}, you are on the naughty list! Better luck next year!`,
+        `Oh no, ${username}! You've been naughty this year!`,
+        `Sorry, ${username}, but you're on the naughty list!`
+    ];
+
+    const niceMessages = [
+        `${username}, you are on the nice list! Great job!`,
+        `Congratulations, ${username}! You're on the nice list!`,
+        `Well done, ${username}! You've made it to the nice list!`
+    ];
+
+    const isNaughty = hashUsername(username) % 2 === 0;
+    const messages = isNaughty ? naughtyMessages : niceMessages;
+    return messages[Math.floor(Math.random() * messages.length)];
+}
 
 // Random username generator
 function getRandomUsername() {
@@ -362,6 +398,13 @@ client.on('message', async (channel, tags, message, self) => {
 
 
     if (isActive) {
+
+        // Santaslist command
+        if (messageFormat === 'NAUGHTYORNICE' && message.toLowerCase() === '!santaslist' && tags.username) {
+            const response = getSantaMessage(tags.username);
+            client.say(channel, response);
+        }
+
         if ((tags.mod || tags.username === 'tighwin' || tags.username?.toLowerCase() === 'everythingnowshow') && message.toLowerCase().startsWith('!format ')) {
             const newFormat = message.split(' ')[1].toUpperCase().replace(' ', '') as MessageFormat;
             if (Object.keys(MessageFormats).includes(newFormat)) {
