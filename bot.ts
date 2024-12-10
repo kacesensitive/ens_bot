@@ -231,13 +231,19 @@ function getSantaMessage(username: string): string {
     const naughtyMessages = [
         `${username}, you are on the naughty list! Better luck next year!`,
         `Oh no, ${username}! You've been naughty this year!`,
-        `Sorry, ${username}, but you're on the naughty list!`
+        `Sorry, ${username}, but you're on the naughty list!`, 
+        `Looks like ${username} is on the naughty list. Maybe a trip to Jonks Mountain will help!`,
+        `Judge Binch would be very disappointed in you, ${username}. You're on the naughty list!`,
+        `You may need to call Tito for advice on how to get on the nice list, ${username}. You're on the naughty list!`
     ];
 
     const niceMessages = [
         `${username}, you are on the nice list! Great job!`,
         `Congratulations, ${username}! You're on the nice list!`,
-        `Well done, ${username}! You've made it to the nice list!`
+        `Well done, ${username}! You've made it to the nice list!`,
+        `How did you do it, ${username}? You're on the nice list! Did you get a wish granted by Jonks?`,
+        `${username}, is more dedicated to being nice than Chris is to the Armenian National Soccer Team!`,
+        `You're on the nice list, ${username}!`
     ];
 
     const isNaughty = hashUsername(username) % 2 === 0;
