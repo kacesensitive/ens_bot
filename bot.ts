@@ -320,6 +320,28 @@ client.on("message", async (channel, tags, message, self) => {
       const newFormat = message.split(" ")[1].toUpperCase().replace(" ", "");
       if (MessageFormats[newFormat]) {
         messageFormat = newFormat;
+
+        // Update active status in database
+        const { error: updateError } = await supabase
+          .from("formats")
+          .update({ active: false })
+          .neq("title", newFormat);
+
+        if (updateError) {
+          console.error("Error updating formats:", updateError);
+          return;
+        }
+
+        const { error: setActiveError } = await supabase
+          .from("formats")
+          .update({ active: true })
+          .eq("title", newFormat);
+
+        if (setActiveError) {
+          console.error("Error setting active format:", setActiveError);
+          return;
+        }
+
         client.say(
           channel,
           `Message format changed to ${MessageFormats[newFormat]}`
