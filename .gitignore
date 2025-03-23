@@ -1,2 +1,10 @@
 node_modules*
 .env
+.yarn
+.yarnrc
+.yarnrc.yml
+.yarnrc.yaml
+.yarnrc.yaml.lock
+.yarnrc.yaml.lock.lock
+.yarnrc.yaml.lock.lock.lock
+.yarnrc.yaml.lock.lock.lock.lock
