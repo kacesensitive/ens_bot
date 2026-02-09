@@ -4,14 +4,23 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node bot.ts"
+    "start": "ts-node bot.ts",
+    "raffle": "ts-node raffle-bot.ts",
+    "discord-raffle": "ts-node discord-raffle.ts",
+    "patreon": "ts-node patreonsync.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
+    "@types/sqlite3": "^5.1.0",
     "@types/tmi.js": "^1.8.3",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.3.1",
+    "openai": "^4.29.0",
+    "sqlite3": "^5.1.7",
     "tmi.js": "^1.8.5",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "yargs": "^17.7.2",
+    "youtube-chat-kacesensitive": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.5.9",

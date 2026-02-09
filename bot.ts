@@ -4,6 +4,17 @@ import { createClient } from "@supabase/supabase-js";
 
 const thankedSubgifters = new Set();
 const subgiftResetTime = 10000;
+const CREDIT_ELIGIBLE_TIERS = new Set(
+  [
+    "Production Crew",
+    "Newscasters",
+    "Council Members",
+    "Hot Dog Standees",
+    "Now York Flight Attendants",
+  ].map((tier) => tier.toLowerCase())
+);
+const PATREON_CREDIT_NOTIFY_COOLDOWN_MS = 10 * 60 * 1000;
+const PATREON_CREDIT_NOTIFY_MIN_INTERVAL_MS = 24 * 60 * 60 * 1000;
 console.log("Starting bot...");
 console.log("Connecting to Twitch chat...");
 
@@ -159,11 +170,12 @@ async function canSubmit(
 ): Promise<boolean> {
   if (isExceptionUser) return true;
 
-  // Check if the user is a recent subscriber
+  // Check if the user is a recent subscriber (excluding Patreon credits)
   const { data: subscriberData, error: subscriberError } = await supabase
     .from("subscribers")
     .select("*")
-    .eq("username", username.toLowerCase());
+    .eq("username", username.toLowerCase())
+    .or("from_patreon.is.null,from_patreon.eq.false");
 
   if (subscriberError) {
     console.error("Error checking subscriber status:", subscriberError);
@@ -207,7 +219,8 @@ async function clearAllSubscribers() {
   const { data, error } = await supabase
     .from("subscribers")
     .delete()
-    .neq("username", "randomguy");
+    .neq("username", "randomguy")
+    .or("from_patreon.is.null,from_patreon.eq.false");
 
   if (error) {
     console.error("Error clearing subscribers:", error);
@@ -227,11 +240,190 @@ async function addSubscriber(username: string) {
   }
 }
 
+async function addPatreonSubscriber(username: string) {
+  const { error } = await supabase
+    .from("subscribers")
+    .insert([{ username: username.toLowerCase(), from_patreon: true }]);
+
+  if (error) {
+    console.error("Error adding Patreon subscriber:", error);
+    return false;
+  }
+  return true;
+}
+
+async function getCreditCount(username: string): Promise<number> {
+  const { count, data, error } = await supabase
+    .from("subscribers")
+    .select("id", { count: "exact", head: true })
+    .eq("username", username.toLowerCase());
+
+  if (error) {
+    console.error("Error fetching credit count:", error);
+    return 0;
+  }
+
+  if (typeof count === "number") {
+    return count;
+  }
+
+  return data?.length ?? 0;
+}
+
+async function getPatreonCreditCount(username: string): Promise<number> {
+  const { count, data, error } = await supabase
+    .from("subscribers")
+    .select("id", { count: "exact", head: true })
+    .eq("username", username.toLowerCase())
+    .eq("from_patreon", true);
+
+  if (error) {
+    console.error("Error fetching Patreon credit count:", error);
+    return 0;
+  }
+
+  if (typeof count === "number") {
+    return count;
+  }
+
+  return data?.length ?? 0;
+}
+
+function normalizeTierTitle(title: string): string {
+  return title.trim().toLowerCase();
+}
+
+function parseEntitledTiers(
+  value: unknown
+): Array<{ id: string; title: string }> {
+  const coerceTier = (
+    item: unknown
+  ): { id: string; title: string } | null => {
+    if (!item || typeof item !== "object") {
+      return null;
+    }
+    const record = item as { id?: unknown; title?: unknown };
+    if (typeof record.id !== "string" || typeof record.title !== "string") {
+      return null;
+    }
+    return { id: record.id, title: record.title };
+  };
+
+  const fromArray = (items: unknown[]): Array<{ id: string; title: string }> =>
+    items
+      .map(coerceTier)
+      .filter((tier): tier is { id: string; title: string } => tier !== null);
+
+  if (Array.isArray(value)) {
+    return fromArray(value);
+  }
+
+  if (typeof value === "string" && value.trim().length > 0) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return fromArray(parsed);
+      }
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function isPatreonEligible(patron: {
+  is_follower: boolean;
+  currently_entitled_tiers: unknown;
+  currently_entitled_amount_cents: number | null;
+  patron_status: string | null;
+}): boolean {
+  if (patron.is_follower) {
+    return false;
+  }
+
+  const tiers = parseEntitledTiers(patron.currently_entitled_tiers);
+  const hasEligibleTier = tiers.some((tier) =>
+    CREDIT_ELIGIBLE_TIERS.has(normalizeTierTitle(tier.title || ""))
+  );
+  const isPaying = (patron.currently_entitled_amount_cents ?? 0) > 0;
+  const isActive = patron.patron_status === "active_patron";
+
+  return hasEligibleTier && isPaying && isActive;
+}
+
+const patreonNotifyLastChecked = new Map<string, number>();
+const patreonNotifyLastSent = new Map<string, number>();
+
+async function maybeNotifyPatreonCredits(
+  channel: string,
+  username: string
+): Promise<void> {
+  try {
+    const normalized = username.toLowerCase();
+    const lastChecked = patreonNotifyLastChecked.get(normalized);
+    if (
+      typeof lastChecked === "number" &&
+      Date.now() - lastChecked < PATREON_CREDIT_NOTIFY_COOLDOWN_MS
+    ) {
+      return;
+    }
+    patreonNotifyLastChecked.set(normalized, Date.now());
+
+    const lastSent = patreonNotifyLastSent.get(normalized);
+    if (
+      typeof lastSent === "number" &&
+      Date.now() - lastSent < PATREON_CREDIT_NOTIFY_MIN_INTERVAL_MS
+    ) {
+      return;
+    }
+
+    const { data: patronData, error: patronError } = await supabase
+      .from("patrons")
+      .select(
+        "currently_entitled_tiers, is_follower, currently_entitled_amount_cents, patron_status"
+      )
+      .eq("twitch_username", normalized);
+
+    if (patronError) {
+      console.error("Error checking Patreon status:", patronError);
+      return;
+    }
+
+    if (!patronData || patronData.length === 0) {
+      return;
+    }
+
+    const eligible = patronData.some((patron: any) =>
+      isPatreonEligible(patron)
+    );
+    if (!eligible) {
+      return;
+    }
+
+    const creditCount = await getPatreonCreditCount(normalized);
+    if (creditCount <= 0) {
+      return;
+    }
+
+    const plural = creditCount === 1 ? "submission" : "submissions";
+    client.say(
+      channel,
+      `Hey ${username}! You've got ${creditCount} bonus ${plural} from your Patreon.`
+    );
+    patreonNotifyLastSent.set(normalized, Date.now());
+  } catch (error) {
+    console.error("Error notifying Patreon credits:", error);
+  }
+}
+
 async function removeOldestSubscriber(username: string): Promise<boolean> {
+  // Remove the oldest subscriber (including Patreon credits)
   const { data, error: fetchError } = await supabase
     .from("subscribers")
     .select("*")
     .eq("username", username.toLowerCase())
+    .order("id", { ascending: true })
     .limit(1);
 
   if (fetchError) {
@@ -266,6 +458,7 @@ let isActive = true;
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
+  console.log(message);
 
   // if 5 "1" are sent in a row send a "2" in chat and vice versa
   if (message === "1") {
@@ -288,6 +481,10 @@ client.on("message", async (channel, tags, message, self) => {
   }
 
   if (isActive) {
+    if (tags.username) {
+      void maybeNotifyPatreonCredits(channel, tags.username);
+    }
+
     // Santaslist command
     if (
       messageFormat === "NAUGHTYORNICE" &&
@@ -417,6 +614,41 @@ client.on("message", async (channel, tags, message, self) => {
       }
     }
 
+    // Add Patreon subscriber (test command)
+    if (
+      (tags.mod ||
+        tags.username === "tighwin" ||
+        tags.username?.toLowerCase() === "everythingnowshow") &&
+      message.toLowerCase().startsWith("!addpatreon")
+    ) {
+      const username = message.split(" ")[1];
+      if (username) {
+        const success = await addPatreonSubscriber(username);
+        if (success) {
+          client.say(
+            channel,
+            `🎉 ${username} has been given a Patreon submission credit!`
+          );
+        } else {
+          client.say(
+            channel,
+            `Error: Failed to add Patreon credit for ${username}.`
+          );
+        }
+      } else {
+        client.say(channel, `Usage: !addpatreon <username>`);
+      }
+    }
+
+    if (message.toLowerCase() === "!credits" && tags.username) {
+      const creditCount = await getCreditCount(tags.username);
+      const creditLabel = creditCount === 1 ? "credit" : "credits";
+      client.say(
+        channel,
+        `Hey ${tags.username}, you have ${creditCount} ${creditLabel}!`
+      );
+    }
+
     if (message.toLowerCase().startsWith("!submit")) {
       if (message.toLowerCase().startsWith("!submit")) {
         const isExceptionUser =
@@ -439,10 +671,15 @@ client.on("message", async (channel, tags, message, self) => {
             }
             const submission = message.slice("!submit".length).trim();
             await saveSubmission(tags.username || "-", submission);
-            client.say(
-              channel,
-              `Thanks for your submission, @${tags.username}!`
-            );
+            try {
+              console.log(`Thanks for your submission, @${tags.username}!`);
+              client.say(
+                channel,
+                `Thanks for your submission, @${tags.username}!`
+              );
+            } catch (error) {
+              console.error("Error sending message:", error);
+            }
           }
         } else {
           client.say(
@@ -549,9 +786,11 @@ setInterval(async () => {
       return;
     }
 
+    // Exclude Patreon subscribers from reminders
     const { data: subscriberData, error: subscriberError } = await supabase
       .from("subscribers")
-      .select("username");
+      .select("username, from_patreon")
+      .or("from_patreon.is.null,from_patreon.eq.false");
 
     if (subscriberError) {
       console.error("Error fetching subscribers:", subscriberError);
