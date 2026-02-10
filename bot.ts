@@ -170,12 +170,11 @@ async function canSubmit(
 ): Promise<boolean> {
   if (isExceptionUser) return true;
 
-  // Check if the user is a recent subscriber (excluding Patreon credits)
+  // Check if the user has any credits (including Patreon)
   const { data: subscriberData, error: subscriberError } = await supabase
     .from("subscribers")
     .select("*")
-    .eq("username", username.toLowerCase())
-    .or("from_patreon.is.null,from_patreon.eq.false");
+    .eq("username", username.toLowerCase());
 
   if (subscriberError) {
     console.error("Error checking subscriber status:", subscriberError);
@@ -418,33 +417,59 @@ async function maybeNotifyPatreonCredits(
 }
 
 async function removeOldestSubscriber(username: string): Promise<boolean> {
-  // Remove the oldest subscriber (including Patreon credits)
-  const { data, error: fetchError } = await supabase
+  // Prioritize consuming normal (non-Patreon) credits first
+  const { data: normalData, error: normalError } = await supabase
     .from("subscribers")
     .select("*")
     .eq("username", username.toLowerCase())
+    .or("from_patreon.is.null,from_patreon.eq.false")
     .order("id", { ascending: true })
     .limit(1);
 
-  if (fetchError) {
-    console.error("Error fetching oldest subscriber:", fetchError);
+  if (normalError) {
+    console.error("Error fetching normal subscriber:", normalError);
     return false;
   }
 
-  if (data.length === 0) {
+  if (normalData.length > 0) {
+    const { error: deleteError } = await supabase
+      .from("subscribers")
+      .delete()
+      .eq("id", normalData[0].id);
+
+    if (deleteError) {
+      console.error("Error removing subscriber:", deleteError);
+      return false;
+    }
+    return true;
+  }
+
+  // No normal credits — fall back to oldest Patreon credit
+  const { data: patreonData, error: patreonError } = await supabase
+    .from("subscribers")
+    .select("*")
+    .eq("username", username.toLowerCase())
+    .eq("from_patreon", true)
+    .order("id", { ascending: true })
+    .limit(1);
+
+  if (patreonError) {
+    console.error("Error fetching Patreon subscriber:", patreonError);
+    return false;
+  }
+
+  if (patreonData.length === 0) {
     console.log("No subscriber found for username:", username);
     return false;
   }
 
-  const oldestSubscriberId = data[0].id;
-
   const { error: deleteError } = await supabase
     .from("subscribers")
     .delete()
-    .eq("id", oldestSubscriberId);
+    .eq("id", patreonData[0].id);
 
   if (deleteError) {
-    console.error("Error removing subscriber:", deleteError);
+    console.error("Error removing Patreon subscriber:", deleteError);
     return false;
   }
 
