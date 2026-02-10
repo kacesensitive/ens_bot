@@ -691,9 +691,7 @@ client.on("message", async (channel, tags, message, self) => {
               `Sorry, @${tags.username}, your submission is too long! Please keep it under ${characterLimit} characters.`
             );
           } else {
-            if (!isExceptionUser) {
-              await removeOldestSubscriber(tags.username || "-");
-            }
+            await removeOldestSubscriber(tags.username || "-");
             const submission = message.slice("!submit".length).trim();
             await saveSubmission(tags.username || "-", submission);
             try {
