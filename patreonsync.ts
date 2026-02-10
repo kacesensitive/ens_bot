@@ -751,10 +751,17 @@ const giveSubmissionCredit = async (
 
     // Send message to chat
     if (twitchClient && sendChatMessage) {
-      twitchClient.say(
-        channel,
-        `🎉 Thank you ${patron.twitch_username} for being a Patreon supporter! You've earned a bonus submission credit! Btw, unlike normal submissions credits, these credits don't expire after the show!`
-      );
+      try {
+        await twitchClient.say(
+          channel,
+          `🎉 Thank you ${patron.twitch_username} for being a Patreon supporter! You've earned a bonus submission credit! Btw, unlike normal submissions credits, these credits don't expire after the show!`
+        );
+      } catch (chatError) {
+        console.warn(
+          `Failed to send chat message for ${patron.twitch_username}:`,
+          chatError
+        );
+      }
     }
 
     console.log(
