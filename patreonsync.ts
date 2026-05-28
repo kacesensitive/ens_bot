@@ -722,6 +722,19 @@ const giveSubmissionCredit = async (
   }
 
   try {
+    const { count: currentCount } = await supabase
+      .from("subscribers")
+      .select("id", { count: "exact", head: true })
+      .eq("username", patron.twitch_username.toLowerCase())
+      .eq("from_patreon", true);
+
+    if ((currentCount ?? 0) >= 5) {
+      console.log(
+        `Skipping ${patron.twitch_username} - already at max 5 Patreon credits`
+      );
+      return false;
+    }
+
     // Add subscriber with from_patreon flag
     const { error } = await supabase.from("subscribers").insert({
       username: patron.twitch_username.toLowerCase(),

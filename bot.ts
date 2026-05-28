@@ -240,6 +240,12 @@ async function addSubscriber(username: string) {
 }
 
 async function addPatreonSubscriber(username: string) {
+  const currentCount = await getPatreonCreditCount(username);
+  if (currentCount >= 5) {
+    console.log(`${username} already has ${currentCount} Patreon credits (max 5)`);
+    return false;
+  }
+
   const { error } = await supabase
     .from("subscribers")
     .insert([{ username: username.toLowerCase(), from_patreon: true }]);
