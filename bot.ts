@@ -1,6 +1,14 @@
 import tmi from "tmi.js";
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import {
+  initializeRaffleDB,
+  addTickets,
+  getUserTickets,
+  getTopTicketHolders,
+  drawWinner,
+  resetAllTickets,
+} from "./raffle";
 
 const thankedSubgifters = new Set();
 const subgiftResetTime = 10000;
@@ -74,6 +82,10 @@ async function loadFormats() {
 
 // Load formats on startup
 loadFormats();
+
+initializeRaffleDB().catch((err) => {
+  console.error("Failed to initialize raffle database:", err);
+});
 
 // Reload formats every hour
 setInterval(loadFormats, 60 * 60 * 1000);
@@ -636,7 +648,7 @@ client.on("message", async (channel, tags, message, self) => {
       (tags.mod ||
         tags.username === "tighwin" ||
         tags.username?.toLowerCase() === "everythingnowshow") &&
-      message.toLowerCase().startsWith("!give")
+      message.toLowerCase().startsWith("!give ")
     ) {
       const username = message.split(" ")[1];
       if (username) {
@@ -719,6 +731,103 @@ client.on("message", async (channel, tags, message, self) => {
       }
     }
 
+    // Raffle commands
+    if (message.toLowerCase() === "!checktickets" && tags.username) {
+      const tickets = await getUserTickets(tags.username);
+      const ticketLabel = tickets === 1 ? "ticket" : "tickets";
+      client.say(
+        channel,
+        `🎟️ @${tags.username}, you have ${tickets} raffle ${ticketLabel}!`
+      );
+    }
+
+    if (message.toLowerCase() === "!toptickets") {
+      const topUsers = await getTopTicketHolders(5);
+      if (topUsers.length === 0) {
+        client.say(channel, "No one has any raffle tickets yet!");
+      } else {
+        const topList = topUsers
+          .map(
+            (user, index) =>
+              `${index + 1}. ${user.username}: ${user.tickets} ticket${
+                user.tickets !== 1 ? "s" : ""
+              }`
+          )
+          .join(", ");
+        client.say(channel, `🏆 Top ticket holders: ${topList}`);
+      }
+    }
+
+    if (message.toLowerCase() === "!rafflehelp") {
+      client.say(
+        channel,
+        "🎫 Raffle commands: !checktickets, !toptickets. Earn tickets by subscribing or gifting subs!"
+      );
+    }
+
+    if (
+      (tags.mod ||
+        tags.username === "tighwin" ||
+        tags.username?.toLowerCase() === "everythingnowshow") &&
+      message.toLowerCase().startsWith("!giveticket")
+    ) {
+      const parts = message.split(" ");
+      if (parts.length >= 2) {
+        const targetUsername = parts[1].startsWith("@")
+          ? parts[1].substring(1)
+          : parts[1];
+        const ticketCount =
+          parts.length >= 3 && !isNaN(parseInt(parts[2]))
+            ? parseInt(parts[2])
+            : 1;
+        try {
+          await addTickets(targetUsername, ticketCount);
+          const ticketLabel = ticketCount === 1 ? "ticket" : "tickets";
+          client.say(
+            channel,
+            `🎁 Gave ${ticketCount} raffle ${ticketLabel} to ${targetUsername}!`
+          );
+        } catch (error) {
+          console.error("Error giving tickets:", error);
+          client.say(channel, `Failed to give tickets to ${targetUsername}.`);
+        }
+      } else {
+        client.say(channel, "Usage: !giveticket <username> [amount]");
+      }
+    }
+
+    if (
+      (tags.mod ||
+        tags.username === "tighwin" ||
+        tags.username?.toLowerCase() === "everythingnowshow") &&
+      message.toLowerCase() === "!drawwinner"
+    ) {
+      const winner = await drawWinner();
+      if (winner) {
+        client.say(
+          channel,
+          `🏆 The raffle winner is @${winner.username}! Congratulations!`
+        );
+      } else {
+        client.say(channel, "No one has any raffle tickets to draw from!");
+      }
+    }
+
+    if (
+      (tags.mod ||
+        tags.username === "tighwin" ||
+        tags.username?.toLowerCase() === "everythingnowshow") &&
+      message.toLowerCase() === "!resetraffle"
+    ) {
+      try {
+        await resetAllTickets();
+        client.say(channel, "🧹 All raffle tickets have been reset.");
+      } catch (error) {
+        console.error("Error resetting raffle:", error);
+        client.say(channel, "Failed to reset raffle tickets.");
+      }
+    }
+
     if (message.toLowerCase() === "!clearall") {
       if (
         tags.username === "tighwin" ||
@@ -755,12 +864,20 @@ client.on("subscription", async (channel, username) => {
   if (isActive && username.toLowerCase() !== "ananonymousgifter") {
     sendMessage(channel, "SUBSCRIPTION", { username });
     await addSubscriber(username);
+    addTickets(username, 1).catch((error) =>
+      console.error(`Error awarding raffle ticket to ${username}:`, error)
+    );
   }
 });
 
 // Updated subgift event
 client.on("subgift", async (channel, username, streakMonths, recipient) => {
   if (isActive && username.toLowerCase() !== "ananonymousgifter") {
+    // 1 raffle ticket per gifted sub (fires once per recipient, so mystery
+    // gifts award one ticket per sub without a separate submysterygift handler)
+    addTickets(username, 1).catch((error) =>
+      console.error(`Error awarding raffle ticket to ${username}:`, error)
+    );
     if (!thankedSubgifters.has(username)) {
       sendMessage(channel, "SUBGIFT", { username, recipient });
       thankedSubgifters.add(username);
@@ -777,6 +894,9 @@ client.on(
     if (isActive && username.toLowerCase() !== "ananonymousgifter") {
       sendMessage(channel, "SUBSCRIPTION", { username });
       await addSubscriber(username);
+      addTickets(username, 1).catch((error) =>
+        console.error(`Error awarding raffle ticket to ${username}:`, error)
+      );
     }
   }
 );
