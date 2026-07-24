@@ -976,8 +976,13 @@ const lastReminderTimes: { [username: string]: number } = {};
 // Every 25 minutes, remind the users with subscriptions to submit
 setInterval(async () => {
   if (isActive) {
-    // Skip reminder for PARTYQUEST format
-    if (messageFormat === "PARTYQUEST" || !Messages[messageFormat]) {
+    // Skip reminder for PARTYQUEST format or when the active format has no
+    // remind message configured
+    if (
+      messageFormat === "PARTYQUEST" ||
+      !Messages[messageFormat] ||
+      !Messages[messageFormat].REMINDSUBMISSION
+    ) {
       return;
     }
 
@@ -1031,6 +1036,12 @@ function sendMessage(
   variables: { [key: string]: string }
 ) {
   let messageTemplate = Messages[messageFormat][category];
+  if (!messageTemplate) {
+    console.log(
+      `No ${category} message configured for format ${messageFormat}, skipping`
+    );
+    return;
+  }
   for (const [key, value] of Object.entries(variables)) {
     messageTemplate = messageTemplate.toString().replace(`{${key}}`, value);
   }
