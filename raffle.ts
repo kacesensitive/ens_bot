@@ -37,51 +37,19 @@ export async function addTickets(
   username: string,
   count: number = 1
 ): Promise<void> {
-  const now = new Date().toISOString();
   const lowerUsername = username.toLowerCase();
 
   try {
-    // Check if user exists
-    const { data: existingUser, error: fetchError } = await supabase
-      .from("raffle_users")
-      .select("*")
-      .eq("username", lowerUsername)
-      .single();
+    // Atomic upsert-and-increment in the database — concurrent awards (e.g.
+    // the subgift burst from a gift bomb) can't lose updates or create
+    // duplicate rows the way a read-then-write from the client can.
+    const { error } = await supabase.rpc("award_raffle_tickets", {
+      p_username: lowerUsername,
+      p_count: count,
+    });
 
-    if (fetchError && fetchError.code !== "PGRST116") {
-      // PGRST116 is "not found" error, which is expected for new users
-      throw fetchError;
-    }
-
-    if (existingUser) {
-      // User exists, update ticket count
-      const { error: updateError } = await supabase
-        .from("raffle_users")
-        .update({
-          tickets: existingUser.tickets + count,
-          updated_at: now,
-        })
-        .eq("username", lowerUsername);
-
-      if (updateError) {
-        throw updateError;
-      }
-    } else {
-      // User doesn't exist, create new entry
-      const { error: insertError } = await supabase
-        .from("raffle_users")
-        .insert([
-          {
-            username: lowerUsername,
-            tickets: count,
-            created_at: now,
-            updated_at: now,
-          },
-        ]);
-
-      if (insertError) {
-        throw insertError;
-      }
+    if (error) {
+      throw error;
     }
 
     // Emit event for ticket added
