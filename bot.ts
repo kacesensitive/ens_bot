@@ -499,6 +499,47 @@ let number2Count = 0;
 
 let isActive = true;
 
+// addTickets does a read-then-write, so concurrent calls for the same user
+// (e.g. the burst of subgift events from a gift bomb) lose updates — run all
+// ticket awards through a single chain instead.
+let ticketChain: Promise<void> = Promise.resolve();
+function queueTickets(username: string, count: number) {
+  ticketChain = ticketChain
+    .then(() => addTickets(username, count))
+    .catch((error) =>
+      console.error(`Error awarding raffle tickets to ${username}:`, error)
+    );
+}
+
+// A mystery gift fires one submysterygift (with the full count) plus one
+// subgift per recipient. Tickets are awarded once via submysterygift; the
+// follow-up subgift events are skipped so the bomb isn't counted twice.
+const pendingMysteryGifts = new Map<
+  string,
+  { count: number; timer: NodeJS.Timeout }
+>();
+
+function markPendingMysteryGifts(username: string, count: number) {
+  const existing = pendingMysteryGifts.get(username);
+  if (existing) clearTimeout(existing.timer);
+  const timer = setTimeout(() => pendingMysteryGifts.delete(username), 60000);
+  pendingMysteryGifts.set(username, {
+    count: (existing?.count || 0) + count,
+    timer,
+  });
+}
+
+function consumePendingMysteryGift(username: string): boolean {
+  const entry = pendingMysteryGifts.get(username);
+  if (!entry || entry.count <= 0) return false;
+  entry.count -= 1;
+  if (entry.count <= 0) {
+    clearTimeout(entry.timer);
+    pendingMysteryGifts.delete(username);
+  }
+  return true;
+}
+
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
   console.log(message);
@@ -864,20 +905,27 @@ client.on("subscription", async (channel, username) => {
   if (isActive && username.toLowerCase() !== "ananonymousgifter") {
     sendMessage(channel, "SUBSCRIPTION", { username });
     await addSubscriber(username);
-    addTickets(username, 1).catch((error) =>
-      console.error(`Error awarding raffle ticket to ${username}:`, error)
-    );
+    queueTickets(username, 1);
+  }
+});
+
+// A mystery gift reports its full count here in a single event — award all
+// tickets at once and mark the follow-up subgift events to be skipped.
+client.on("submysterygift", async (channel, username, numOfSubs) => {
+  if (isActive && username.toLowerCase() !== "ananonymousgifter") {
+    markPendingMysteryGifts(username, numOfSubs);
+    queueTickets(username, numOfSubs);
   }
 });
 
 // Updated subgift event
 client.on("subgift", async (channel, username, streakMonths, recipient) => {
   if (isActive && username.toLowerCase() !== "ananonymousgifter") {
-    // 1 raffle ticket per gifted sub (fires once per recipient, so mystery
-    // gifts award one ticket per sub without a separate submysterygift handler)
-    addTickets(username, 1).catch((error) =>
-      console.error(`Error awarding raffle ticket to ${username}:`, error)
-    );
+    // 1 raffle ticket per solo gifted sub; subgifts that are part of a
+    // mystery gift were already counted in the submysterygift handler
+    if (!consumePendingMysteryGift(username)) {
+      queueTickets(username, 1);
+    }
     if (!thankedSubgifters.has(username)) {
       sendMessage(channel, "SUBGIFT", { username, recipient });
       thankedSubgifters.add(username);
@@ -894,9 +942,7 @@ client.on(
     if (isActive && username.toLowerCase() !== "ananonymousgifter") {
       sendMessage(channel, "SUBSCRIPTION", { username });
       await addSubscriber(username);
-      addTickets(username, 1).catch((error) =>
-        console.error(`Error awarding raffle ticket to ${username}:`, error)
-      );
+      queueTickets(username, 1);
     }
   }
 );
